@@ -16,73 +16,66 @@ require 'find'
 
 ARGV << '-h' if ARGV.empty?
 
-## Globals ##
-$OPTIONS = Hash.new
-$FILES = Array.new
-
 ## start Methods ## 
 
+## Method to get command line arguments, make sure they are correct and return them.
 def parseOpts
 
+  dir = nil
+  ext = nil
   # run through and parse the command line options
-  $OPTIONS = {}
   OptionParser.new do |opt|
-    opt.on('-d', '--directory DIRECTORY') { |o| $OPTIONS[:dir] = o }
-    opt.on('-e', '--extension EXTENSION') { |o| $OPTIONS[:ext] = o }
+    opt.on('-d', '--directory DIRECTORY') { |o| dir = o }
+    opt.on('-e', '--extension EXTENSION') { |o| ext = o }
   end.parse!
   # if both required options aren't defiend tell the user so. 
-  Kernel.abort("\n## Missing command line element -d ##\n\n") if $OPTIONS[:dir].nil?
-  Kernel.abort("\n## Missing command line element -e ##\n\n") if $OPTIONS[:ext].nil?
+  Kernel.abort("\n## Missing command line element -d ##\n\n") if !dir
+  Kernel.abort("\n## Missing command line element -e ##\n\n") if !ext
   # lets just check as well to make sure they defiend a real dir.
-  Kernel.abort("\n## Directory doesn't exist! Please try again ## \n\n") if !File.directory?($OPTIONS[:dir])
+  Kernel.abort("\n## Directory doesn't exist! Please try again ## \n\n") if !File.directory?(dir)
+  return dir, ext
 
 end
 
 ## Small method to prompt the user to make sure they really really want to do this. 
-def getSure
+def getSure(dir, ext)
 
-  print "\n## You have selected to recursivly compress all files under #{$OPTIONS[:dir]} with the extension #{$OPTIONS[:ext]}\n## Are you sure? (y/n):";
+  print "\n## You have selected to recursivly compress all files under #{dir} with the extension #{ext}\n## Are you sure? (y/n):";
   sel = $stdin.gets.chomp
   if sel == "y"
     return 1
   elsif sel  == "n"
-    return 0
+    return nil
     # return nothing to abort
   else 
     print "Unknown entry, aborting\n"
-    return 0
+    return nil
   end
 
 end
 
 ## Small method that rips through defined dirs and grabs list of files.
-def getFiles
+def getFiles(dir, ext)
 
+  files = []
   print "-> Collecting list of files to compress.\n";
-  Find.find($OPTIONS[:dir]) do |path|
-    $FILES << path if path =~ /.*\.#{$OPTIONS[:ext]}$/
+  Find.find(dir) do |path|
+    files << path if path =~ /.*\.#{ext}$/
   end
   print "-> Done\n";
+  return files
 
 end
 
-## Method to compress all files in the array and tell you
-def compressFiles
+## Method to compress all files in the file and tell you
+def compressFiles(files)
+  
   print "-> Starting compression\n"
-  $FILES.each do |file|
+  files.each do |file|
     puts "--> Compressing file: #{file}"
-    # ick! System. BUt is pretty quick. 
     system("gzip #{file}")
   end
   print "-> Done!\n\n"
-
-  ## if we want to do it properly then it would be like this.. but %$^&$ no bzip2 support nativly. 
-  #orig = 'hurrah.txt'
-  #Zlib::GzipWriter.open('hurrah.txt.gz') do |gz|
-  #gz.mtime = File.mtime(orig)
-  #gz.orig_name = orig
-  #gz.write IO.binread(orig)
-  #end
 
 end
 
@@ -90,10 +83,10 @@ end
 
 ## EXECUTION ## 
 
-parseOpts
-if getSure == 1
-  getFiles
-  compressFiles
+dir, ext = parseOpts
+if getSure(dir, ext)
+  allfiles = getFiles(dir, ext)
+  compressFiles(allfiles)
 else 
   print "Aborted\n";
 end
