@@ -16,7 +16,7 @@ require 'find'
 
 ARGV << '-h' if ARGV.empty?
 
-## start Methods ## 
+## Start Methods ## 
 
 ## Method to get command line arguments, make sure they are correct and return them.
 def parseOpts
