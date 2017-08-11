@@ -5,7 +5,7 @@
 ## compressAll.rb : A simple program to take a directory and a file extension type then
 ## recurse throguh the directory and all subdirectiories bzip2ing all files it finds 
 ## that match the defined extension. Originally written to compress
-## old CDRS. Gives a pretty progress bar and ETA for completion. 
+## old CDRS.
 ## 
 ## Usage : compressAll.rb -d /directory/to/files/and/recurse -e txt
 ##
@@ -71,11 +71,12 @@ def compressFiles
   print "-> Starting compression\n"
   $FILES.each do |file|
     puts "--> Compressing file: #{file}"
+    # ick! System. BUt is pretty quick. 
     system("gzip #{file}")
   end
   print "-> Done!\n\n"
 
-  ## if we want to do it properly then it owuld be like this.. but %$^&$ no bzip2 support nativly. 
+  ## if we want to do it properly then it would be like this.. but %$^&$ no bzip2 support nativly. 
   #orig = 'hurrah.txt'
   #Zlib::GzipWriter.open('hurrah.txt.gz') do |gz|
   #gz.mtime = File.mtime(orig)
