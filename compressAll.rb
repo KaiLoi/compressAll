@@ -66,7 +66,7 @@ def getFiles
 
 end
 
-## Method to compress all files in the file and tell you
+## Method to compress all files in the array and tell you
 def compressFiles
   print "-> Starting compression\n"
   $FILES.each do |file|
@@ -88,7 +88,7 @@ end
 
 ## End Methods ## 
 
-## execution ## 
+## EXECUTION ## 
 
 parseOpts
 if getSure == 1
@@ -98,5 +98,4 @@ else
   print "Aborted\n";
 end
 
-
-## End of line ##
+## END OF LINE ##
